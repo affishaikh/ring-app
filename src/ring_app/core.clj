@@ -4,7 +4,8 @@
     [ring.util.response :refer [response file-response]]
     [clojure.data.json :as json]
     [ring.middleware.resource :refer [wrap-resource]]
-    [ring.middleware.params :as p]))
+    [ring.middleware.params :as p]
+    [clj-http.client :as client]))
 
 (defn handler
   [request]
@@ -15,7 +16,8 @@
                                :body    "App!!!"}
     (= "/file" (:uri request)) (file-response "project.clj")
     (and (= "/form" (:uri request)) (= :post (:request-method request)))
-      (response (json/json-str (json/read-str (slurp (:body request)))))))
+      (response (json/json-str (json/read-str (slurp (:body request)))))
+    (= "/someone-else" (:uri request)) (client/get "https://www.google.com")))
 
 (def app
   (p/wrap-params (wrap-resource handler "public")))
